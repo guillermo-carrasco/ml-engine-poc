@@ -25,9 +25,9 @@ def get_twitter_dataset(overwrite=False):
     # Build some simple features
     data['language'] = 'EN'
     data['twit_length'] = data['SentimentText'].apply(len)
-    data['Set'] = np.nan
-    data.loc[X_train.index, 'Set'] = 'TRAIN'
-    data.loc[X_test.index, 'Set'] = 'TEST'
+    data['Training'] = np.nan
+    data.loc[X_train.index, 'Training'] = True
+    data.loc[X_test.index, 'Training'] = False
 
     data.to_csv('data/data.csv')
 
@@ -48,7 +48,7 @@ def create_bigquery_dataset(ds_name, table_name, data):
         SchemaField('SentimentText', 'STRING', mode='required'),
         SchemaField('language', 'STRING', mode='required'),
         SchemaField('twit_length', 'INT64', mode='required'),
-        SchemaField('Set', 'STRING', mode='required')
+        SchemaField('Training', 'BOOLEAN', mode='required')
     ]
     client = bigquery.Client()
 
@@ -88,9 +88,9 @@ def create_bigquery_dataset(ds_name, table_name, data):
         print('Uploading batch {}'.format(str(batch_n)))
         errors = client.insert_rows(table, batch)
         if errors:
-            print('There were errors copying batch {}: {}'.format(str(batch_n, '\n'.join(errors))))
+            print('There were errors copying batch {}: {}'.format(str(batch_n, str(errors))))
 
 
 if __name__ == '__main__':
-    data = get_twitter_dataset()
+    data = get_twitter_dataset(overwrite=True)
     create_bigquery_dataset('twitter_data', 'twits', data)
