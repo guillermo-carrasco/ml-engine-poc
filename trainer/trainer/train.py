@@ -3,21 +3,20 @@ import os
 import subprocess
 import sys
 
-from google.cloud import bigquery
+import pandas as pd
+
 from sklearn.externals import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 
+# Get service account key
+subprocess.check_call(['gsutil', 'cp', 'gs://guillermo-ml-test/service.json', 'service.json'])
+
 # Get data from BigQuery
-client = bigquery.Client.from_service_account_json('~/')
-query = (
-    'SELECT * FROM `twitter_data.twits`'
-    'WHERE Training = true'
-)
-query_job = client.query(query)
-rows = query_job.result()
-data = rows.to_dataframe()
+data = pd.read_gbq('SELECT * FROM twitter_data.twits WHERE Training = true',
+                   project_id='izettle-data-poc',
+                   private_key='service.json')
 X = data['SentimentText']
 y = data['Sentiment']
 
