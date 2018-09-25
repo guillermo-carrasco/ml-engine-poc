@@ -3,3 +3,5 @@ train.sh
 __pycache__
 model.joblib
 *.pyc
+predict.sh
+service.json

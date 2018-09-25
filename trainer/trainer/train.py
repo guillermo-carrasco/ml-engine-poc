@@ -10,7 +10,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.pipeline import Pipeline
 
 # Get data from BigQuery
-client = bigquery.Client()
+client = bigquery.Client.from_service_account_json('~/')
 query = (
     'SELECT * FROM `twitter_data.twits`'
     'WHERE Training = true'
